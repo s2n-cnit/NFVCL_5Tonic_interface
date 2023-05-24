@@ -123,7 +123,7 @@ class Free5gck8sBlueCreateModel(Create5gModel):
 #######################################################################
 # Simplified model
 class MiniDataNet(BaseModel):
-    default5qi = str
+    default5qi : str
 
 
 class MiniNetworkEndpoints(BaseModel):
@@ -131,13 +131,13 @@ class MiniNetworkEndpoints(BaseModel):
 
 
 class MiniProfileParams(BaseModel):
-    sliceAmbr = str
+    sliceAmbr : str
 
 
 class MiniSliceProfile(BaseModel):
-    sliceId = str
-    sliceType = str
-    profileParams = MiniProfileParams
+    sliceId : str
+    sliceType : str
+    profileParams : MiniProfileParams
 
 
 class MiniConfig(BaseModel):

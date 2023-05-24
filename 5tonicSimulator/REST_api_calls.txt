@@ -1,0 +1,11 @@
+
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/addslice -d @free5gcpyaload.json
+
+
+
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/delslice -d @free5gcpyaload.json
+
+
+
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/checkslice -d @free5gcpyaload.json
+

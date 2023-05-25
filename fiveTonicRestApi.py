@@ -23,7 +23,7 @@ class FiveTonicRestApi():
 
         self.headers = {"Content-Type": "application/json"}
 
-    def __checkRestResponse(selfs, response: requests.Response) -> bool:
+    def __checkRestResponse(self, response: requests.Response) -> bool:
         rightResponseList = [
             requests.codes.ok, requests.codes.accepted, requests.codes.created, requests.codes.no_content
         ]

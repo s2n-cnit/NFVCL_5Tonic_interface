@@ -23,3 +23,12 @@ class SstConvertion():
     @classmethod
     def to5Tonic(cls, value: str = None):
         return next((v for k,v in cls.sstType.items() if k == value.upper()), None)
+
+
+class BandwidthConvertion():
+    bitTable = {"bps": 1, "kbps": 1024, "mbps": 1048576, "gbps": 1073741824}
+
+    @classmethod
+    def convert(cls, value: str = "0 Mbps", toUnit: str = "bps") -> int:
+        intValue, unitValue = value.split()
+        return intValue*cls.bitTable[unitValue.lower()]/cls.bitTable[toUnit.lower()]

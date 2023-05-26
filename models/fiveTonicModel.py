@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from models.blue5gModel import Free5gck8sBlueCreateModel, MiniFree5gcModel
 from utils.util import SstConvertion
 from utils.fiveqi import fiveqiTable
+from utils.util import BandwidthConvertion
 
 
 class OnboardModel(BaseModel):
@@ -48,8 +49,10 @@ class RadioSliceProfileModel(BaseModel):
         radioSliceProfileObject.sST = SstConvertion.to5Tonic(msg.config.sliceProfiles[0].sliceType)
         radioSliceProfileObject.latency = next((item["packetDelayBudget"] for item in fiveqiTable
                                                 if item["value"]==msg.config.network_endpoints.data_nets[0].default5qi),9)
-        radioSliceProfileObject.uLThptPerSlice = msg.config.sliceProfiles[0].profileParams.sliceAmbr
-        radioSliceProfileObject.dLThptPerSlice = msg.config.sliceProfiles[0].profileParams.sliceAmbr
+        radioSliceProfileObject.uLThptPerSlice = BandwidthConvertion.convert(
+            msg.config.sliceProfiles[0].profileParams.sliceAmbr, "bps")
+        radioSliceProfileObject.dLThptPerSlice = BandwidthConvertion.convert(
+            msg.config.sliceProfiles[0].profileParams.sliceAmbr, "bps")
         return radioSliceProfileObject
 
 

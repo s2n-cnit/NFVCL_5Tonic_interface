@@ -13,8 +13,7 @@ from models import Free5gck8sBlueCreateModel, MiniFree5gcModel, OnboardModel, \
 from fiveTonicRestApi import FiveTonicRestApi
 from utils import create_logger
 
-fiveTonicHost = "127.0.0.1"
-
+fiveTonicParametersFile = "fivetonichost.txt"
 logger = create_logger("Router")
 
 northRouter = APIRouter(
@@ -23,7 +22,17 @@ northRouter = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-fiveTonicInterface = FiveTonicRestApi(fiveTonicHost, "44300")
+try:
+    with open(fiveTonicParametersFile, "r") as f:
+        fiveTonicHost = f.readline()
+        fiveTonicPort = f.readline()
+        f.close()
+        logger.info("Read from file (\"{}\"): Athonet host-port: {} - {}".format(fiveTonicParametersFile, fiveTonicHost, fiveTonicPort))
+except Exception as e:
+    logger.error("Impossible to read the file \"{}\"".format(fiveTonicParametersFile))
+    raise ValueError("Impossible to read the file \"{}\"".format(fiveTonicParametersFile))
+
+fiveTonicInterface = FiveTonicRestApi(fiveTonicHost, fiveTonicPort)
 
 
 class RestAnswer202(BaseModel):

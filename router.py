@@ -24,8 +24,8 @@ northRouter = APIRouter(
 
 try:
     with open(fiveTonicParametersFile, "r") as f:
-        fiveTonicHost = f.readline()
-        fiveTonicPort = f.readline()
+        fiveTonicHost = f.readline().split("\n")[0]
+        fiveTonicPort = f.readline().split("\n")[0]
         f.close()
         logger.info("Read from file (\"{}\"): Athonet host-port: {} - {}".format(fiveTonicParametersFile, fiveTonicHost, fiveTonicPort))
 except Exception as e:

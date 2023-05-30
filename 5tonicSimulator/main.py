@@ -134,7 +134,7 @@ async def queryNsLcmOpOccList():
         ]
 
 @fiveTonicRouter.get("/nslcm/v1/ns_lcm_op_occs/{lcmOpOccId}")
-async def queryNsLcmOpOcc():
+async def queryNsLcmOpOcc(lcmOpOccId: str):
     logger.info("Query NsLCMOpOcc")
     logger.info("lcmOpOccId: {}".format(lcmOpOccId))
     return {

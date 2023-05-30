@@ -48,7 +48,7 @@ class RadioSliceProfileModel(BaseModel):
         radioSliceProfileObject.radioAccessTEchnology = "NR"
         radioSliceProfileObject.sST = SstConvertion.to5Tonic(msg.config.sliceProfiles[0].sliceType)
         radioSliceProfileObject.latency = next((item["packetDelayBudget"] for item in fiveqiTable
-                                                if item["value"]==msg.config.network_endpoints.data_nets[0].default5qi),9)
+                                                if item["value"]==int(msg.config.network_endpoints.data_nets[0].default5qi)),9)
         radioSliceProfileObject.uLThptPerSlice = BandwidthConvertion.convert(
             msg.config.sliceProfiles[0].profileParams.sliceAmbr, "bps")
         radioSliceProfileObject.dLThptPerSlice = BandwidthConvertion.convert(

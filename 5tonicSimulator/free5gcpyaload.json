@@ -24,7 +24,7 @@
         "dnnList": ["internet"],
         "profileParams": {
           "isolationLevel": "ISOLATION",
-          "sliceAmbr": "1000 Mbps",
+          "sliceAmbr": "100 Mbps",
           "ueAmbr": "50 Mbps",
           "maximumNumberUE": 10,
           "pduSessions": [

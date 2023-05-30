@@ -16,6 +16,7 @@ def create_logger(name: str) -> logging.getLogger:
     logger.addHandler(ch)
     return logger
 
+logger = create_logger("utils")
 
 class SstConvertion():
     sstType = {"EMBB": "eMBB", "URLCC": "URLCC", "MMTC": "mMTC"}
@@ -31,4 +32,4 @@ class BandwidthConvertion():
     @classmethod
     def convert(cls, value: str = "0 Mbps", toUnit: str = "bps") -> int:
         intValue, unitValue = value.split()
-        return int(intValue)*cls.bitTable[unitValue.lower()]/cls.bitTable[toUnit.lower()]
+        return int(int(intValue)*cls.bitTable[unitValue.lower()]/cls.bitTable[toUnit.lower()])

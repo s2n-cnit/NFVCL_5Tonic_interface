@@ -99,9 +99,9 @@ async def addSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcM
     try:
         # onboarding
         ns = fiveTonicInterface.nsOnboard(onBoardObject)
-        if ns.nsState == "NOT_INSTANTIATED":
-            logger.warn("slice not instantiated")
-            raise ValueError("slice not instantiated")
+        #if ns.nsState == "NOT_INSTANTIATED":
+        #    logger.warn("slice not instantiated")
+        #    raise ValueError("slice not instantiated")
 
         #instantiate
         fiveTonicInterface.nsInstantiate(ns.id, instantiateObject)

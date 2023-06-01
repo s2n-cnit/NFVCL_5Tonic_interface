@@ -29,20 +29,23 @@ class OnboardModel(BaseModel):
     nsDescription: str = "Network Service for Ford deployment"
 
 class RadioSliceProfileModel(BaseModel):
-    site: str = "FORD" # 5Tonic, Innovalia, * FORD *
-    coverageArea: str = "FORD_ENGINE_PLANT"
+    site: str = "FORD_VALENCIA" # 5Tonic, Innovalia, * FORD_VALENCIA *
+    coverageArea: str = "ENGINE_INDOOR" # ENGINE_INDOOR or ENGINE_OUTDOOT
     radioAccessTEchnology: str = "NR" # 4G, mmW, * NR *
     sST: str = "eMBB" # URLLC, mMTC, * eMBB *
     latency: int = 1 # OWD in ms
     uLThptPerSlice: Optional[int] #uplinkth: int # bps
     dLThptPerSlice: Optional[int] #downlinkth: int # bps
 
+class RadioSliceObject:
+    radioSliceProfile: RadioSliceProfileModel
+
 class InstantiateModel(BaseModel):
     """
     Message model for NS Instantiate operation
     """
     flavourId: str = "normal"
-    radioSliceProfile: RadioSliceProfileModel = RadioSliceProfileModel()
+    sapData: List[RadioSliceObject] = []
 
 fiveTonicRouter = APIRouter(
         prefix="",

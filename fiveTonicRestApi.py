@@ -21,7 +21,7 @@ class FiveTonicRestApi():
         self.nsInstancesURLextension = "/ns_instances"
         self.nsLCMOpOccURLExtension = "/ns_lcm_op_occs"
 
-        self.headers = {"Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json", "Version": "1.0"}
 
     def __checkRestResponse(self, response: requests.Response) -> bool:
         rightResponseList = [

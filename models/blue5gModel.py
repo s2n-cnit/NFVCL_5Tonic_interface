@@ -130,14 +130,10 @@ class MiniNetworkEndpoints(BaseModel):
     data_nets: List[MiniDataNet]
 
 
-class MiniProfileParams(BaseModel):
-    sliceAmbr: str
-
-
 class MiniSliceProfile(BaseModel):
     sliceId: str
     sliceType: str
-    profileParams: MiniProfileParams
+    sliceAmbr: str
 
 
 class MiniConfig(BaseModel):
@@ -146,6 +142,10 @@ class MiniConfig(BaseModel):
 
 
 class MiniFree5gcModel(BaseModel):
+    callbackURL: Optional[HttpUrl] = Field(
+        default='',
+        description='url that will be used to notify when the topology terraform ends'
+    )   
     config: MiniConfig
 
 

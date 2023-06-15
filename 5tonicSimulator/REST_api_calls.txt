@@ -1,11 +1,19 @@
 
-curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/addslice -d @free5gcpyaload.json
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/nfvcl/v1/api/blue/Free5GC_K8s/AABBCC/add_slice -d @free5gcpyaload.json
 
 
 
-curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/delslice -d @free5gcpyaload.json
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/nfvcl/v1/api/blue/Free5GC_K8s/AABBCC/del_slice -d @free5gcpyaload.json
 
 
 
-curl -H 'Content-Type: application/json' -X POST http://localhost:5002/v1/checkslice -d @free5gcpyaload.json
+curl -H 'Content-Type: application/json' -X POST http://localhost:5002/nfvcl/v1/api/blue/Free5GC_K8s/AABBCC/check_slice -d @free5gcpyaload.json
+
+
+ http://192.168.13.17:5002/nfvcl/v1/api/blue/Free5GC_K8s/V4AVFL/add_slice
+
+curl -v -X GET -H "Content-Type: application/json" -H "Version: 1.0" http://10.3.3.41:8500/nslcm/v1/ns_instances --data '{}' | python3 -m json.tool
+
+curl -v -X DELETE --data '{}' -H "Content-Type: application/json" -H "Version: 1.0" http://10.3.3.41:8500/nslcm/v1/ns_instances/87d43d38-0152-42d9-83a3-3c97674c5a9f | python3 -m json.tool
+
 

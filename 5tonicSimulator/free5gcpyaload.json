@@ -1,5 +1,6 @@
 {
   "type": "Free5GC_K8s",
+  "callbackURL": "http://192.168.13.17:8080/",
   "config": {
     "network_endpoints": {
       "mgt": "mngn-vnf-os",

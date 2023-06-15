@@ -4,6 +4,7 @@ Copyright (c) 2023 - S2N Lab (https://s2n.cnit.it/)
 """
 import fastapi
 import time
+import requests
 from threading import Thread
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -17,7 +18,7 @@ fiveTonicParametersFile = "fivetonichost.txt"
 logger = create_logger("Router")
 
 northRouter = APIRouter(
-    prefix="/v1",
+    prefix="",
     tags=["NorthRouter"],
     responses={404: {"description": "Not found"}}
 )
@@ -41,6 +42,36 @@ class RestAnswer202(BaseModel):
     status: str = "submitted"
 
 
+
+def restCallback(callback, requestedOperation, blueId, sessionId, status):
+    if callback:
+        logger.info("Generating callback message")
+        headers = {
+                "Content-type": "application/json",
+                "Accept": "application/json"
+                }
+        data = {
+                "blueprint":
+                {
+                    "id": blueId,
+                    "type": "Free5GC_K8s"
+                },
+                "requested_operation": requestedOperation,
+                "session_id": blueId,
+                "status": status
+              }
+        r = None
+        try:
+            r = requests.post(callback, json=data, params=None, verify=False, stream=True, headers=headers)
+            return r
+        except Exception as e:
+            logger.error("Error - posting callback: ", e)
+    else:
+        logger.info("No callback message is specified")
+        return None
+
+
+
 def getSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]) -> NsInstance:
     nsList = fiveTonicInterface.nsQueryList()
     nsName = "{}{}".format(
@@ -58,11 +89,46 @@ def getLcmOpOcc(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcMode
     return next((item for item in nsLcmOpOccList if item.nsInstanceId == slice.id), None)
 
 
-def deleteSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]):
+def instantiateSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], id, instantiateObject, blueId, requestedOperation):
+    # check if slice is onboarded and then instantiate it
+    partialTimer = 0
+    totalTime = 600 # 5 minutes in seconds
+    clock = 2 # in seconds
+    callback = free5gcMessage.callbackURL
+    try:
+        ns = getSlice(free5gcMessage)
+        fiveTonicInterface.nsInstantiate(ns.id, instantiateObject)
+        while True:
+            time.sleep(clock)
+            ns = getSlice(free5gcMessage)
+            logger.info("NS: {}".format(ns))
+            if ns and ns.nsState.upper() == "INSTANTIATED":
+                logger.info("Instantiated")
+                if callback != "":
+                    restCallback(callback, requestedOperation, blueId, blueId, "ready")
+                return
+            else:
+                logger.info("wait {} seconds...".format(clock))
+                time.sleep(clock)
+                partialTimer += clock
+                if partialTimer == totalTime:
+                    logger.info("Operation timed out")
+                    if callback != "":
+                        restCallback(callback, requestedOperation, blueId, blueId, "failed")
+                    return
+
+    except Exception as e:
+        logger.warn("Impossible to delete the slice: {}".format(e))
+        if callback != "":
+            restCallback(callback, requestedOperation, blueId, blueId, "failed")
+        raise fastapi.HTTPException(status_code=404, detail="Impossible to delete the slice: {}".format(e))
+
+def deleteSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], blueId, requestedOperation):
     # check if slice is terminated and then delete it
     partialTimer = 0
     totalTime = 600 # 5 minutes in seconds
     clock = 2 # in seconds
+    callback = free5gcMessage.callbackURL
     try:
         while True:
             nsLcmOpOcc = getLcmOpOcc(free5gcMessage)
@@ -76,20 +142,39 @@ def deleteSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcMode
                 time.sleep(clock)
                 partialTimer += clock
                 if partialTimer == totalTime:
-                    logger.info("Operation timed out")
-                    break
-                continue
+                    logger.info("Operation timed out (1)")
+                    if callback != "":
+                        restCallback(callback, requestedOperation, blueId, blueId, "failed")
+                    return
             else:
-                logger.info("Removing of slice")
-                fiveTonicInterface.nsDelete(getSlice(free5gcMessage).id)
-                break
+                while True:
+                    ns = getSlice(free5gcMessage)
+                    logger.info("NS: {}".format(ns))
+                    if ns and ns.nsState.upper() == "NOT_INSTANTIATED":
+                        logger.info("Removing of slice")
+                        fiveTonicInterface.nsDelete(ns.id)
+                        if callback != "":
+                            restCallback(callback, requestedOperation, blueId, blueId, "ready")
+                        return
+                    else:
+                        logger.info("wait {} seconds...".format(clock))
+                        time.sleep(clock)
+                        partialTimer += clock
+                        if partialTimer == totalTime:
+                            logger.info("Operation timed out (2)")
+                            if callback != "":
+                                restCallback(callback, requestedOperation, blueId, blueId, "failed")
+                            return
+
     except Exception as e:
         logger.warn("Impossible to delete the slice: {}".format(e))
+        if callback != "":
+            restCallback(callback, requestedOperation, blueId, blueId, "failed")
         raise fastapi.HTTPException(status_code=404, detail="Impossible to delete the slice: {}".format(e))
 
 
-@northRouter.post("/addslice", response_model=RestAnswer202)
-async def addSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]):
+@northRouter.post("/nfvcl/v1/api/blue/Free5GC_K8s/{blue_id}/add_slice", response_model=RestAnswer202)
+async def addSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], blue_id: str):
     onBoardObject = OnboardModel.fromFree5GcModel(free5gcMessage)
     instantiateObject = InstantiateModel.fromFree5GcModel(free5gcMessage)
 
@@ -104,16 +189,16 @@ async def addSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcM
         #    raise ValueError("slice not instantiated")
 
         #instantiate
-        fiveTonicInterface.nsInstantiate(ns.id, instantiateObject)
+        thread = Thread(target=instantiateSlice, args=(free5gcMessage, ns.id, instantiateObject, blue_id, "add_slice",))
+        thread.start()
+        return RestAnswer202()
     except Exception as e:
         logger.warn("Impossible to create the slice: {}".format(e))
         raise fastapi.HTTPException(status_code=404, detail="Impossible to create the slice: {}".format(e))
 
-    return RestAnswer202()
 
-
-@northRouter.post("/delslice", response_model=RestAnswer202)
-async def delSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]):
+@northRouter.delete("/nfvcl/v1/api/blue/Free5GC_K8s/{blue_id}/del_slice", response_model=RestAnswer202)
+async def delSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], blue_id: str):
     try:
         # get the slice from 5Tonic
         ns = getSlice(free5gcMessage)
@@ -125,7 +210,7 @@ async def delSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcM
         fiveTonicInterface.nsTerminate(ns.id)
 
         # launch a thread to check when the slice will be terminated and then delete it
-        thread = Thread(target=deleteSlice, args=(free5gcMessage,))
+        thread = Thread(target=deleteSlice, args=(free5gcMessage, blue_id, "del_slice"))
         thread.start()
         return RestAnswer202()
     except Exception as e:
@@ -133,8 +218,8 @@ async def delSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcM
         raise fastapi.HTTPException(status_code=404, detail="Impossible to delete the slice: {}".format(e))
 
 
-@northRouter.post("/checkslice", response_model=RestAnswer202)
-async def checkSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]):
+@northRouter.post("/nfvcl/v1/api/blue/Free5GC_K8s/{blue_id}/check_slice", response_model=RestAnswer202)
+async def checkSlice(free5gcMessage: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], blue_id: str):
     try:
         nsLcmOpOcc = getLcmOpOcc(free5gcMessage)
         if not nsLcmOpOcc:

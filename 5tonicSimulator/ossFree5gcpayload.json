@@ -1,0 +1,46 @@
+{
+  "callbackURL": "http://192.168.13.17:8080/",
+  "config": {
+    "sliceProfiles": [
+      {
+        "sliceId": "213",
+        "sliceAmbr": "1000.00Mbps",
+        "minimumGuaranteedBandwidth": "10000.00Mbps",
+        "enabledUEList": [
+          {
+            "ICCID": "*"
+          }
+        ],
+        "locationConstraints": [
+          {
+            "geographicalAreaId": "64888229d3c780a0d931ea36"
+          }
+        ],
+        "profileParams": {
+          "isolationLevel": "NO_ISOLATION",
+          "pduSessions": [
+            {
+              "pduSessionId": "11",
+              "flows": [
+                {
+                  "flowId": "f1",
+                  "5qi": "1"
+                }
+              ]
+            }
+          ]
+        },
+        "sliceType": "URLLC"
+      }
+    ],
+    "network_endpoints": {
+      "data_nets": [
+        {
+          "default5qi": "1"
+        }
+      ]
+    }
+  }
+}
+    
+

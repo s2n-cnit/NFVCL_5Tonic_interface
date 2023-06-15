@@ -31,5 +31,10 @@ class BandwidthConvertion():
 
     @classmethod
     def convert(cls, value: str = "0 Mbps", toUnit: str = "bps") -> int:
-        intValue, unitValue = value.split()
-        return int(int(intValue)*cls.bitTable[unitValue.lower()]/cls.bitTable[toUnit.lower()])
+        for i,c in enumerate(value):
+            if not c.isdigit() and c != ".":
+                break
+        floatValue = value[:i]
+        unitValue = value[i:].strip()
+        #intValue, unitValue = value.split()
+        return int(int(float(floatValue))*cls.bitTable[unitValue.lower()]/cls.bitTable[toUnit.lower()])

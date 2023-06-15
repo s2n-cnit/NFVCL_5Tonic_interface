@@ -5,6 +5,7 @@
 Copyright (c) 2023 - S2N Lab (https://s2n.cnit.it/)
 """
 import requests
+import json
 from utils import create_logger
 from models import *
 
@@ -57,7 +58,7 @@ class FiveTonicRestApi():
     def __restDelete(self, restUrl: str = None, data = None) -> requests.Response:
         try:
             logger.info("DELETE Message sent: url={} - {}".format(restUrl, data))
-            r = requests.delete(restUrl, json=data, params=None, verify=False, headers=self.headers)
+            r = requests.delete(restUrl, data=json.dumps(data), params=None, verify=False, headers=self.headers)
             logger.info("DELETE Response received: url={} - {} - {}".format(restUrl, r, r.json()))
             return r
         except Exception as e:
@@ -211,8 +212,9 @@ class FiveTonicRestApi():
             if not self.__checkRestResponse(r):
                 raise ValueError("response return this error: {}".format(r.status_code))
         except Exception as e:
-            logger.error("{}".format(e))
-            raise ValueError("{}".format(e))
+            #logger.error("{}".format(e))
+            logger.warn("{}".format(e))
+            #raise ValueError("{}".format(e))
 
 
 

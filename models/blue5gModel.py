@@ -130,10 +130,16 @@ class MiniNetworkEndpoints(BaseModel):
     data_nets: List[MiniDataNet]
 
 
+class LocationConstraint(BaseModel):
+    geographicalAreaId: str
+    localAreaId: str = ""
+
+
 class MiniSliceProfile(BaseModel):
     sliceId: str
     sliceType: str
     sliceAmbr: str
+    locationConstraints: List[LocationConstraint] = []
 
 
 class MiniConfig(BaseModel):

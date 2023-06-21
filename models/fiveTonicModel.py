@@ -33,7 +33,7 @@ class OnboardModel(BaseModel):
 
 class RadioSliceProfileModel(BaseModel):
     site: str = "FORD_VALENCIA" # 5Tonic, Innovalia, * FORD_VALENCIA *
-    coverageArea: str = "FORD_INDOOR" # ENGINE_INDOOR or ENGINE_OUTDOOT
+    coverageArea: str = "FORD_INDOOR" # ENGINE_INDOOR or ENGINE_OUTDOOR
     radioAccessTEchnology: str = "NR" # 4G, mmW, * NR *
     sST: str = "eMBB" # URLLC, mMTC, * eMBB *
     latency: int = 1 # OWD in ms
@@ -41,10 +41,10 @@ class RadioSliceProfileModel(BaseModel):
     dLThptPerSlice: Optional[int] #downlinkth: int # bps
 
     @classmethod
-    def fromFree5GcModel(cls, msg: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]) -> RadioSliceProfileModel:
+    def fromFree5GcModel(cls, msg: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel], coverageArea: Union["ENGINE_INDOOR", "ENGINE_OUTDOOR"] = "ENGINE_INDOOR") -> RadioSliceProfileModel:
         radioSliceProfileObject = RadioSliceProfileModel()
         radioSliceProfileObject.site = "FORD_VALENCIA"
-        radioSliceProfileObject.coverageArea = "ENGINE_INDOOR" # ENGINE_INDOOR or ENGINE_OUTDOOR
+        radioSliceProfileObject.coverageArea = coverageArea # ENGINE_INDOOR or ENGINE_OUTDOOR
         radioSliceProfileObject.radioAccessTEchnology = "NR"
         radioSliceProfileObject.sST = SstConvertion.to5Tonic(msg.config.sliceProfiles[0].sliceType)
         radioSliceProfileObject.latency = next((item["packetDelayBudget"] for item in fiveqiTable
@@ -60,9 +60,28 @@ class RadioSliceProfileObject(BaseModel):
 
     @classmethod
     def fromFree5GcModel(cls, msg: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]) -> RadioSliceProfileObject:
-        radioSliceProfileObject = RadioSliceProfileObject()
-        radioSliceProfileObject.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg)
-        return radioSliceProfileObject
+        radioSliceProfileArray = []
+        for locationConstraint in msg.config.sliceProfiles[0].locationConstraints:
+            if locationConstraint.localAreaId == "FORD_VALENCIA":
+                item = RadioSliceProfileObject()
+                item.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg, "ENGINE_INDOOR")
+                radioSliceProfileArray.append(item)
+                item = RadioSliceProfileObject()
+                item.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg, "ENGINE_OUTDOOR")
+                radioSliceProfileArray.append(item)
+            elif locationConstraint.localAreaId == "FORD_VALENCIA_INDOOR":
+                item = RadioSliceProfileObject()
+                item.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg, "ENGINE_INDOOR")
+                radioSliceProfileArray.append(item)
+            elif locationConstraint.localAreaId == "FORD_VALENCIA_OUTDOOR":
+                item = RadioSliceProfileObject()
+                item.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg, "ENGINE_OUTDOOR")
+                radioSliceProfileArray.append(item)
+            else:
+                item = RadioSliceProfileObject()
+                item.radioSliceProfile = RadioSliceProfileModel.fromFree5GcModel(msg, "ENGINE_INDOOR")
+                radioSliceProfileArray.append(item)
+        return radioSliceProfileArray
 
 class InstantiateModel(BaseModel):
     """
@@ -75,7 +94,7 @@ class InstantiateModel(BaseModel):
     def fromFree5GcModel(cls, msg: Union[Free5gck8sBlueCreateModel, MiniFree5gcModel]) -> InstantiateModel:
         instantiateObject = InstantiateModel()
         instantiateObject.flavourId = "normal"
-        instantiateObject.sapData.append(RadioSliceProfileObject.fromFree5GcModel(msg))
+        instantiateObject.sapData.extend(RadioSliceProfileObject.fromFree5GcModel(msg))
         return instantiateObject
 
 

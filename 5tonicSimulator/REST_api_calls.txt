@@ -3,7 +3,7 @@ curl -H 'Content-Type: application/json' -X POST http://localhost:5002/nfvcl/v1/
 
 
 
-curl -H 'Content-Type: application/json' -X POST http://localhost:5002/nfvcl/v1/api/blue/Free5GC_K8s/AABBCC/del_slice -d @free5gcpyaload.json
+curl -H 'Content-Type: application/json' -X DELETE http://localhost:5002/nfvcl/v1/api/blue/Free5GC_K8s/AABBCC/del_slice -d @free5gcpyaload.json
 
 
 

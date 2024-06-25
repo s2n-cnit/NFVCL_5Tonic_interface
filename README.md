@@ -11,7 +11,22 @@ A more detailed description of the NFVCL will be added to the [Wiki](https://nfv
 --
 
 ## Getting started
---
+After download the code, follow the steps below:
+- Configure "athonethost.txt" and "imsilist.txt":
+  - "fivetonichost.txt": IP address and port of the 5Tonic interface
+    ``` bash
+    # fivetonichost.txt
+    127.0.0.1
+    8500
+    ```
+- Execute the "setup.sh" script. It download and install all the software needed for the execution of the "NFVCL Athonet Interface".
+  ``` bash
+  ./setup.sh
+  ```
+- Lauch "run.sh". This script creates two screens where the code will be in execution.
+  ``` bash
+  ./run.sh
+  ```
 
 
 

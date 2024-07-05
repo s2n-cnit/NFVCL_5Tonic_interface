@@ -7,8 +7,6 @@ It can create, deploy and manage the lifecycle of different network ecosystems b
 artefacts at any programmability levels (from physical devices to cloud-native microservices).
 A more detailed description of the NFVCL will be added to the [Wiki](https://nfvcl-ng.readthedocs.io/en/latest/index.html).
 
-## How does it work
---
 
 ## Getting started
 After download the code, follow the steps below:

@@ -28,7 +28,7 @@ Slice Onboarding -> Slice Instantiation
 
 Similarly the "del slice" operation is also composed by two subsequent functions: "terminate" and "delete".
 ```
-Slice Termintate -> Slice Delete
+Slice Terminate -> Slice Delete
 ```
 
 

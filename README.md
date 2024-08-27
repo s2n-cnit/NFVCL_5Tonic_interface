@@ -14,6 +14,7 @@ It is possible to execute three operations using the NTI:
 
 The first operation is just to check if a specific slice (using name as search key) yet exist in the system.
 Then using the "add slice" request, a slice can be instantiated. 
+
 The 5 Tonic 5G core accepts the following parameters for every slice:
 - coverage area (indoor or outdoor)
 - latency in ms 

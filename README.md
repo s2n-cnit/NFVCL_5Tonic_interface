@@ -9,8 +9,10 @@ A more detailed description of the NFVCL will be added to the [Wiki](https://nfv
 
 
 ## Workflow
-It is possible to execute three operations using the NTI: "check slice", "add slice" and "del slice".
-The first operation is just to check if a specific slice (using a name as search key) yet exist in the system.
+It is possible to execute three operations using the NTI: 
+"check slice", "add slice" and "del slice".
+
+The first operation is just to check if a specific slice (using name as search key) yet exist in the system.
 Then using the "add slice" request, a slice can be instantiated. 
 The 5 Tonic 5G core accepts the following parameters for every slice:
 - coverage area (indoor or outdoor)

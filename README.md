@@ -8,6 +8,27 @@ artefacts at any programmability levels (from physical devices to cloud-native m
 A more detailed description of the NFVCL will be added to the [Wiki](https://nfvcl-ng.readthedocs.io/en/latest/index.html).
 
 
+## Workflow
+It is possible to execute three operations using the NTI: "check slice", "add slice" and "del slice".
+The first operation is just to check if a specific slice (using a name as search key) yet exist in the system.
+Then using the "add slice" request, a slice can be instantiated. 
+The 5 Tonic 5G core accepts the following parameters for every slice:
+- coverage area (indoor or outdoor)
+- latency in ms 
+- uplink throughput in bps
+- downlink throughput in bps
+  
+The slice creation is executed in two steps: "onboarding" (a group of preliminary operations) and the definitive "instantiation".
+```
+Slice Onboarding -> Slice Instantiation
+```
+
+Similarly the "del slice" operation is also composed by two subsequent functions: "terminate" and "delete".
+```
+Slice Termintate -> Slice Delete
+```
+
+
 ## Getting started
 After download the code, follow the steps below:
 - Configure "athonethost.txt" and "imsilist.txt":
